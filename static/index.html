@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda de Eventos</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main>
+    <h1>Agenda de Eventos</h1>
+
+    <section class="caixa">
+      <h2>Cadastrar evento</h2>
+      <form id="form-evento">
+        <input id="titulo" placeholder="Nome do evento" required>
+        <input id="local" placeholder="Local" required>
+        <div class="linha">
+          <input id="data" type="date" required>
+          <input id="hora" type="time">
+        </div>
+        <textarea id="descricao" placeholder="Descrição" rows="3"></textarea>
+        <button type="submit">Cadastrar</button>
+      </form>
+      <p id="mensagem"></p>
+    </section>
+
+    <section class="caixa">
+      <h2>Eventos</h2>
+      <form id="form-busca" class="linha">
+        <input id="busca" placeholder="Pesquisar evento pelo nome">
+        <button type="submit">Pesquisar</button>
+        <button type="button" id="limpar" class="secundario">Listar todos</button>
+      </form>
+      <ul id="lista"></ul>
+    </section>
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

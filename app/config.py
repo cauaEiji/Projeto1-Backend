@@ -1,5 +1,9 @@
-DB_HOST = "localhost"
-DB_PORT = 3306
-DB_USER = "root"
-DB_PASSWORD = "colocar_senha_aqui"
-DB_NAME = "agenda_eventos"
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+DB_PATH = os.path.join(BASE_DIR, "agenda_eventos.db")
+SCHEMA_PATH = os.path.join(BASE_DIR, "sql", "schema.sql")

@@ -1,0 +1,76 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f2f2;
+  color: #222;
+}
+
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+h1 { text-align: center; }
+h2 { margin-top: 0; font-size: 1.2em; }
+
+.caixa {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+input, textarea, button {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+#form-evento input, #form-evento textarea {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.linha {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.linha input { flex: 1; min-width: 140px; }
+
+button {
+  background: #2d6cdf;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover { opacity: 0.9; }
+button.secundario { background: #777; }
+button.excluir { background: #c0392b; }
+
+#mensagem { min-height: 1.2em; margin: 8px 0 0; }
+.erro { color: #c0392b; }
+.ok { color: #1e8449; }
+
+#lista { list-style: none; padding: 0; margin: 12px 0 0; }
+
+#lista li {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+#lista .info p { margin: 4px 0; }
+#lista .vazio { justify-content: center; color: #777; }

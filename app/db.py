@@ -1,12 +1,15 @@
-import mysql.connector
+import sqlite3
 from app import config
 
 
 def get_connection():
-    return mysql.connector.connect(
-        host=config.DB_HOST,
-        port=config.DB_PORT,
-        user=config.DB_USER,
-        password=config.DB_PASSWORD,
-        database=config.DB_NAME,
-    )
+    conn = sqlite3.connect(config.DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    with open(config.SCHEMA_PATH, encoding="utf-8") as f:
+        schema = f.read()
+    with get_connection() as conn:
+        conn.executescript(schema)
