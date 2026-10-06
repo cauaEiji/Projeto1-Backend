@@ -59,9 +59,9 @@ button.excluir { background: #c0392b; }
 .erro { color: #c0392b; }
 .ok { color: #1e8449; }
 
-#lista { list-style: none; padding: 0; margin: 12px 0 0; }
+.lista { list-style: none; padding: 0; margin: 12px 0 0; }
 
-#lista li {
+.lista li {
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 10px;
@@ -72,5 +72,18 @@ button.excluir { background: #c0392b; }
   gap: 10px;
 }
 
-#lista .info p { margin: 4px 0; }
-#lista .vazio { justify-content: center; color: #777; }
+.lista .info p { margin: 4px 0; }
+.lista .vazio { justify-content: center; color: #777; }
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.9em;
+  color: #444;
+}
+
+.paginacao button { padding: 6px 10px; }
+.paginacao button:disabled { opacity: 0.4; cursor: default; }

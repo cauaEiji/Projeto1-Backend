@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS eventos (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  id          INT AUTO_INCREMENT PRIMARY KEY,
   titulo      VARCHAR(150) NOT NULL,
   descricao   TEXT,
   local       VARCHAR(120) NOT NULL,
@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS eventos (
   criado_em   DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_eventos_data   ON eventos (data);
-CREATE INDEX IF NOT EXISTS idx_eventos_titulo ON eventos (titulo);
+CREATE INDEX idx_eventos_data   ON eventos (data);
+CREATE INDEX idx_eventos_titulo ON eventos (titulo);

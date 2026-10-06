@@ -1,32 +1,60 @@
-from app.db import get_connection
+from app.db import get_cursor
 
 CAMPOS = "id, titulo, descricao, local, data, hora, criado_em"
 
 
-def listar(nome=None, data=None):
-    sql = f"SELECT {CAMPOS} FROM eventos WHERE 1=1"
+def _serializar(row):
+    if row is None:
+        return None
+    if row["data"] is not None:
+        row["data"] = row["data"].isoformat()
+    if row["hora"] is not None:
+        segundos = int(row["hora"].total_seconds())
+        row["hora"] = f"{segundos // 3600:02d}:{segundos % 3600 // 60:02d}"
+    if row["criado_em"] is not None:
+        row["criado_em"] = row["criado_em"].isoformat(sep=" ")
+    return row
+
+
+def _filtros(nome, data):
+    condicoes = []
     params = []
     if nome:
-        sql += " AND titulo LIKE ?"
+        condicoes.append("titulo LIKE %s")
         params.append(f"%{nome}%")
     if data:
-        sql += " AND data = ?"
+        condicoes.append("data = %s")
         params.append(data)
-    sql += " ORDER BY data, hora"
-    with get_connection() as conn:
-        return [dict(r) for r in conn.execute(sql, params).fetchall()]
+    where = ("WHERE " + " AND ".join(condicoes)) if condicoes else ""
+    return where, params
+
+
+def listar(nome=None, data=None, limit=10, offset=0):
+    where, params = _filtros(nome, data)
+    sql = f"SELECT {CAMPOS} FROM eventos {where} ORDER BY data, hora LIMIT %s OFFSET %s"
+    with get_cursor() as cur:
+        cur.execute(sql, params + [limit, offset])
+        return [_serializar(r) for r in cur.fetchall()]
+
+
+def contar(nome=None, data=None):
+    where, params = _filtros(nome, data)
+    sql = f"SELECT COUNT(*) AS total FROM eventos {where}"
+    with get_cursor() as cur:
+        cur.execute(sql, params)
+        return cur.fetchone()["total"]
 
 
 def buscar(evento_id):
-    with get_connection() as conn:
-        row = conn.execute(f"SELECT {CAMPOS} FROM eventos WHERE id = ?", (evento_id,)).fetchone()
-    return dict(row) if row else None
+    with get_cursor() as cur:
+        cur.execute(f"SELECT {CAMPOS} FROM eventos WHERE id = %s", (evento_id,))
+        return _serializar(cur.fetchone())
 
 
 def criar(titulo, descricao, local, data, hora):
-    with get_connection() as conn:
-        cur = conn.execute(
-            "INSERT INTO eventos (titulo, descricao, local, data, hora) VALUES (?, ?, ?, ?, ?)",
+    with get_cursor() as cur:
+        cur.execute(
+            "INSERT INTO eventos (titulo, descricao, local, data, hora) VALUES (%s, %s, %s, %s, %s)",
             (titulo, descricao, local, data, hora),
         )
         novo_id = cur.lastrowid
@@ -34,6 +62,6 @@ def criar(titulo, descricao, local, data, hora):
 
 
 def excluir(evento_id):
-    with get_connection() as conn:
-        cur = conn.execute("DELETE FROM eventos WHERE id = ?", (evento_id,))
-    return cur.rowcount > 0
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM eventos WHERE id = %s", (evento_id,))
+        return cur.rowcount > 0
