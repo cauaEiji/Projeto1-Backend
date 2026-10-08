@@ -24,7 +24,7 @@ h2 { margin-top: 0; font-size: 1.2em; }
   margin-bottom: 20px;
 }
 
-input, textarea, button {
+input, textarea, select, button {
   font: inherit;
   padding: 8px;
   border: 1px solid #bbb;
@@ -42,7 +42,9 @@ input, textarea, button {
   flex-wrap: wrap;
 }
 
-.linha input { flex: 1; min-width: 140px; }
+.linha input, .linha select { flex: 1; min-width: 140px; }
+[hidden] { display: none !important; }
+.topo { justify-content: space-between; align-items: center; }
 
 button {
   background: #2d6cdf;
@@ -55,7 +57,7 @@ button:hover { opacity: 0.9; }
 button.secundario { background: #777; }
 button.excluir { background: #c0392b; }
 
-#mensagem { min-height: 1.2em; margin: 8px 0 0; }
+#mensagem, #mensagem-usuario { min-height: 1.2em; margin: 8px 0 0; }
 .erro { color: #c0392b; }
 .ok { color: #1e8449; }
 
@@ -74,6 +76,10 @@ button.excluir { background: #c0392b; }
 
 .lista .info p { margin: 4px 0; }
 .lista .vazio { justify-content: center; color: #777; }
+
+a.autor { color: #2d6cdf; }
+.perfil-dados h3 { margin: 0 0 4px; }
+.perfil-dados p { margin: 2px 0; color: #444; }
 
 .paginacao {
   display: flex;

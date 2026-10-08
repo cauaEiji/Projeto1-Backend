@@ -5,10 +5,17 @@ from app.controllers import evento_controller as controller
 bp = Blueprint("eventos", __name__, url_prefix="/api/eventos")
 
 
-# GET /api/eventos?nome=&data=AAAA-MM-DD&page=&per_page=
+# GET /api/eventos?nome=&data=AAAA-MM-DD&page=&per_page=  (nome busca no título ou no autor)
 @bp.get("")
 def listar_eventos():
     payload, status = controller.listar(request.args)
+    return jsonify(payload), status
+
+
+# GET /api/eventos/busca/<termo>?page=&per_page=  (termo busca no título ou no autor)
+@bp.get("/busca/<string:termo>")
+def buscar_eventos(termo):
+    payload, status = controller.buscar(termo, request.args)
     return jsonify(payload), status
 
 
@@ -19,7 +26,7 @@ def obter_evento(evento_id):
     return jsonify(payload), status
 
 
-# POST /api/eventos  {titulo, descricao, local, data, hora}
+# POST /api/eventos  {usuario_id, titulo, descricao, local, data, hora}
 @bp.post("")
 def criar_evento():
     dados = request.get_json(silent=True) or {}

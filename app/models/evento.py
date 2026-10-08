@@ -1,6 +1,8 @@
-from app.db import get_cursor
+from app.db import get_connection
 
-CAMPOS = "id, titulo, descricao, local, data, hora, criado_em"
+# "e" = tabela eventos, "u" = tabela usuarios (o JOIN traz o nome do autor)
+CAMPOS = "e.id, e.usuario_id, u.nome AS autor, e.titulo, e.descricao, e.local, e.data, e.hora, e.criado_em"
+TABELAS = "eventos e JOIN usuarios u ON u.id = e.usuario_id"
 
 
 def _serializar(row):
@@ -16,52 +18,118 @@ def _serializar(row):
     return row
 
 
-def _filtros(nome, data):
+def _filtros(nome, data, usuario_id=None):
     condicoes = []
     params = []
+    if usuario_id:
+        condicoes.append("e.usuario_id = %s")
+        params.append(usuario_id)
     if nome:
-        condicoes.append("titulo LIKE %s")
+        # pesquisa pelo título do evento OU pelo nome do autor
+        condicoes.append("(e.titulo LIKE %s OR u.nome LIKE %s)")
+        params.append(f"%{nome}%")
         params.append(f"%{nome}%")
     if data:
-        condicoes.append("data = %s")
+        condicoes.append("e.data = %s")
         params.append(data)
     where = ("WHERE " + " AND ".join(condicoes)) if condicoes else ""
     return where, params
 
 
-def listar(nome=None, data=None, limit=10, offset=0):
-    where, params = _filtros(nome, data)
-    sql = f"SELECT {CAMPOS} FROM eventos {where} ORDER BY data, hora LIMIT %s OFFSET %s"
-    with get_cursor() as cur:
-        cur.execute(sql, params + [limit, offset])
-        return [_serializar(r) for r in cur.fetchall()]
+def listar(nome=None, data=None, limit=10, offset=0, usuario_id=None):
+    where, params = _filtros(nome, data, usuario_id)
+
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute(
+        f"SELECT {CAMPOS} FROM {TABELAS} {where} ORDER BY e.data, e.hora LIMIT %s OFFSET %s",
+        tuple(params + [limit, offset]),
+    )
+
+    eventos = cur.fetchall()
+
+    cur.close()
+    cnx.close()
+
+    return [_serializar(e) for e in eventos]
 
 
-def contar(nome=None, data=None):
-    where, params = _filtros(nome, data)
-    sql = f"SELECT COUNT(*) AS total FROM eventos {where}"
-    with get_cursor() as cur:
-        cur.execute(sql, params)
-        return cur.fetchone()["total"]
+def contar(nome=None, data=None, usuario_id=None):
+    where, params = _filtros(nome, data, usuario_id)
+
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute(f"SELECT COUNT(*) AS total FROM {TABELAS} {where}", tuple(params))
+
+    total = cur.fetchone()["total"]
+
+    cur.close()
+    cnx.close()
+
+    return total
+
+
+def listar_por_usuario(usuario_id):
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute(
+        f"SELECT {CAMPOS} FROM {TABELAS} WHERE e.usuario_id = %s ORDER BY e.data, e.hora",
+        (usuario_id,),
+    )
+
+    eventos = cur.fetchall()
+
+    cur.close()
+    cnx.close()
+
+    return [_serializar(e) for e in eventos]
 
 
 def buscar(evento_id):
-    with get_cursor() as cur:
-        cur.execute(f"SELECT {CAMPOS} FROM eventos WHERE id = %s", (evento_id,))
-        return _serializar(cur.fetchone())
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute(f"SELECT {CAMPOS} FROM {TABELAS} WHERE e.id = %s", (evento_id,))
+
+    evento = cur.fetchone()
+
+    cur.close()
+    cnx.close()
+
+    return _serializar(evento)
 
 
-def criar(titulo, descricao, local, data, hora):
-    with get_cursor() as cur:
-        cur.execute(
-            "INSERT INTO eventos (titulo, descricao, local, data, hora) VALUES (%s, %s, %s, %s, %s)",
-            (titulo, descricao, local, data, hora),
-        )
-        novo_id = cur.lastrowid
+def criar(usuario_id, titulo, descricao, local, data, hora):
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute(
+        "INSERT INTO eventos (usuario_id, titulo, descricao, local, data, hora) VALUES (%s, %s, %s, %s, %s, %s)",
+        (usuario_id, titulo, descricao, local, data, hora),
+    )
+    cnx.commit()
+
+    novo_id = cur.lastrowid
+
+    cur.close()
+    cnx.close()
+
     return buscar(novo_id)
 
 
 def excluir(evento_id):
-    with get_cursor() as cur:
-        cur.execute("DELETE FROM eventos WHERE id = %s", (evento_id,))
-        return cur.rowcount > 0
+    cnx = get_connection()
+    cur = cnx.cursor(dictionary=True)
+
+    cur.execute("DELETE FROM eventos WHERE id = %s", (evento_id,))
+    cnx.commit()
+
+    excluiu = cur.rowcount > 0
+
+    cur.close()
+    cnx.close()
+
+    return excluiu

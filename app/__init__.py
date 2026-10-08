@@ -11,6 +11,8 @@ def create_app():
     init_db()
 
     from app.routes.evento_routes import bp as eventos_bp
+    from app.routes.usuario_routes import bp as usuarios_bp
+    app.register_blueprint(usuarios_bp)
     app.register_blueprint(eventos_bp)
 
     @app.get("/")

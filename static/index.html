@@ -11,6 +11,24 @@
     <h1>Agenda de Eventos</h1>
 
     <section class="caixa">
+      <h2>Minha agenda</h2>
+      <form id="form-usuario" class="linha">
+        <input id="usuario-nome" placeholder="Seu nome (no primeiro acesso)">
+        <input id="usuario-email" type="email" placeholder="Seu email" required>
+        <button type="submit">Entrar</button>
+      </form>
+      <div id="area-usuario" hidden>
+        <div class="linha topo">
+          <span id="usuario-atual"></span>
+          <button type="button" id="sair" class="secundario">Trocar usuário</button>
+        </div>
+        <ul id="meus-eventos" class="lista"></ul>
+        <div class="paginacao" id="paginacao-meus"></div>
+      </div>
+      <p id="mensagem-usuario"></p>
+    </section>
+
+    <section class="caixa" id="secao-evento" hidden>
       <h2>Cadastrar evento</h2>
       <form id="form-evento">
         <input id="titulo" placeholder="Nome do evento" required>
@@ -28,12 +46,34 @@
     <section class="caixa">
       <h2>Eventos</h2>
       <form id="form-busca" class="linha">
-        <input id="busca" placeholder="Pesquisar evento pelo nome">
+        <input id="busca" placeholder="Pesquisar evento pelo nome ou autor">
         <button type="submit">Pesquisar</button>
         <button type="button" id="limpar" class="secundario">Listar todos</button>
       </form>
       <ul id="lista" class="lista"></ul>
       <div class="paginacao" id="paginacao-eventos"></div>
+    </section>
+
+    <section class="caixa" id="secao-usuarios">
+      <h2>Usuários</h2>
+      <form id="form-usuarios" class="linha">
+        <input id="busca-usuario" placeholder="Pesquisar usuário pelo nome" required>
+        <button type="submit">Pesquisar</button>
+      </form>
+      <ul id="lista-usuarios" class="lista"></ul>
+
+      <div id="perfil" hidden>
+        <hr>
+        <div class="linha topo">
+          <div class="perfil-dados">
+            <h3 id="perfil-nome"></h3>
+            <p id="perfil-email"></p>
+            <p id="perfil-total"></p>
+          </div>
+          <button type="button" id="fechar-perfil" class="secundario">Fechar perfil</button>
+        </div>
+        <ul id="perfil-eventos" class="lista"></ul>
+      </div>
     </section>
   </main>
 

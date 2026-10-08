@@ -1,6 +1,6 @@
 from datetime import date, time
 
-from app.models import evento
+from app.models import evento, usuario
 from app.pagination import montar_pagina, parse_paginacao
 
 
@@ -20,8 +20,8 @@ def _hora_valida(valor):
         return False
 
 
-def listar(args):
-    nome = (args.get("nome") or "").strip()
+def listar(args, usuario_id=None, termo=None):
+    nome = (termo or args.get("nome") or "").strip()
     data = (args.get("data") or "").strip()
 
     if data and not _data_valida(data):
@@ -31,9 +31,15 @@ def listar(args):
     if erro:
         return {"erro": erro}, 400
 
-    total = evento.contar(nome or None, data or None)
-    itens = evento.listar(nome or None, data or None, limit=per_page, offset=(page - 1) * per_page)
+    total = evento.contar(nome or None, data or None, usuario_id)
+    itens = evento.listar(
+        nome or None, data or None, limit=per_page, offset=(page - 1) * per_page, usuario_id=usuario_id
+    )
     return montar_pagina(itens, total, page, per_page), 200
+
+
+def buscar(termo, args):
+    return listar(args, termo=termo)
 
 
 def obter(evento_id):
@@ -44,6 +50,7 @@ def obter(evento_id):
 
 
 def criar(dados):
+    usuario_id = dados.get("usuario_id")
     titulo = str(dados.get("titulo", "")).strip()
     descricao = str(dados.get("descricao", "")).strip()
     local = str(dados.get("local", "")).strip()
@@ -51,6 +58,8 @@ def criar(dados):
     hora = str(dados.get("hora", "")).strip()
 
     erros = []
+    if not isinstance(usuario_id, int) or not usuario.buscar(usuario_id):
+        erros.append("usuario_id é obrigatório e deve ser de um usuário existente")
     if not titulo:
         erros.append("titulo é obrigatório")
     if not local:
@@ -62,7 +71,7 @@ def criar(dados):
     if erros:
         return {"erro": "; ".join(erros)}, 400
 
-    novo = evento.criar(titulo, descricao or None, local, data, hora or None)
+    novo = evento.criar(usuario_id, titulo, descricao or None, local, data, hora or None)
     return novo, 201
 
 
